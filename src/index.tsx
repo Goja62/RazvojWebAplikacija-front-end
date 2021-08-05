@@ -4,11 +4,17 @@ import './index.css';
 import App from './components/App/App';
 import reportWebVitals from './reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.min.css'
-import { MainManu } from './components/MaunManu/MainManu';
+import { MainManu, MainManuItem } from './components/MaunManu/MainManu';
+
+const menuItems = [
+  new MainManuItem('Home', '/'),
+  new MainManuItem('Contact', '/contact/'),
+  new MainManuItem('Log in', '/user/login/'),
+]
 
 ReactDOM.render(
   <React.StrictMode>
-    <MainManu></MainManu>
+    <MainManu items = { menuItems }></MainManu>
     <App />
   </React.StrictMode>,
   document.getElementById('root')

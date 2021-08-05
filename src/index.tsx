@@ -4,9 +4,11 @@ import './index.css';
 import App from './components/App/App';
 import reportWebVitals from './reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.min.css'
+import { MainManu } from './components/MaunManu/MainManu';
 
 ReactDOM.render(
   <React.StrictMode>
+    <MainManu></MainManu>
     <App />
   </React.StrictMode>,
   document.getElementById('root')

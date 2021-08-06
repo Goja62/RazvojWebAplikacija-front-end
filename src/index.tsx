@@ -1,10 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './components/App/App';
+import HomePage from './components/App/HomePage';
 import reportWebVitals from './reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { MainManu, MainManuItem } from './components/MaunManu/MainManu';
+import { ContactPage } from './components/ContactPage/ContactPage';
+import { UserLoginPage } from './components/UserLoginPage/UserLoginPage';
+import { HashRouter, Route } from 'react-router-dom';
+import Switch from 'react-bootstrap/esm/Switch';
 
 const menuItems = [
   new MainManuItem('Home', '/'),
@@ -15,7 +19,13 @@ const menuItems = [
 ReactDOM.render(
   <React.StrictMode>
     <MainManu items = { menuItems }></MainManu>
-    <App />
+    <HashRouter>
+      <Switch>
+        <Route exact path = "/" component = { HomePage }></Route>
+        <Route path = "/contact" component = { ContactPage }></Route>
+        <Route path = "/user/login" component = { UserLoginPage }></Route>
+      </Switch>
+    </HashRouter>
   </React.StrictMode>,
   document.getElementById('root')
 );

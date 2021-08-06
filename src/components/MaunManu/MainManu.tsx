@@ -1,5 +1,6 @@
 import React from "react";
 import { Container, Nav } from "react-bootstrap";
+import { HashRouter, Link } from "react-router-dom";
 
 export class MainManuItem {
 	text: string = '';
@@ -27,12 +28,6 @@ export class MainManu extends React.Component<MainManuProporties> {
 		this.state = {
 			items: props.items
 		}
-
-		setInterval(() => {
-			const novaLista = [ ...this.state.items]
-			novaLista.push(new MainManuItem('Naslov', '/link'))
-			this.setItems(novaLista)
-		}, 2000)
 	}
 
 	setItems(items: MainManuItem[]) {
@@ -45,7 +40,9 @@ export class MainManu extends React.Component<MainManuProporties> {
 		return(
 			<Container>
 				<Nav variant = "tabs">
-					{ this.state.items.map(this.makeNavLink) }
+					<HashRouter>
+						{ this.state.items.map(this.makeNavLink) }
+					</HashRouter>
 				</Nav>
 			</Container>
 		);
@@ -53,7 +50,7 @@ export class MainManu extends React.Component<MainManuProporties> {
 
 	private makeNavLink(item: MainManuItem) {
 		return(
-			<Nav.Link href = { item.link }>{ item.text }</Nav.Link>
+			<Link to = { item.link } className = 'nav-link'>{ item.text }</Link>
 		);
 	}
 }

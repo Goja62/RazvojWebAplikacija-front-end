@@ -17,7 +17,6 @@ export class UserLoginPage extends React.Component {
                         </Card.Text>
                     </Card.Body>
                 </Card>
-                
             </Container>
         );
     }

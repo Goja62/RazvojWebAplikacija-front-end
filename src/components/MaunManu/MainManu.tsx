@@ -15,12 +15,37 @@ interface MainManuProporties {
 	items: MainManuItem[];
 }
 
+interface mainManuState {
+	items: MainManuItem[];
+}
+
 export class MainManu extends React.Component<MainManuProporties> {
+	state: mainManuState
+	constructor(props: MainManuProporties | Readonly<MainManuProporties>) {
+		super(props);
+
+		this.state = {
+			items: props.items
+		}
+
+		setInterval(() => {
+			const novaLista = [ ...this.state.items]
+			novaLista.push(new MainManuItem('Naslov', '/link'))
+			this.setItems(novaLista)
+		}, 2000)
+	}
+
+	setItems(items: MainManuItem[]) {
+		this.setState({
+			items: items,
+		})
+	}
+
 	render() {
 		return(
 			<Container>
 				<Nav variant = "tabs">
-					{ this.props.items.map(this.makeNavLink) }
+					{ this.state.items.map(this.makeNavLink) }
 				</Nav>
 			</Container>
 		);

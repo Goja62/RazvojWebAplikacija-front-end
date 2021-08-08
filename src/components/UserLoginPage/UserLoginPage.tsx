@@ -61,7 +61,7 @@ export class UserLoginPage extends React.Component {
         )
         .then((res: ApiResponse) => {
             if (res.status === 'error') {
-                this.seterrorMessage('System error...')
+                this.seterrorMessage('System error... Try again!')
                 return
             }
 

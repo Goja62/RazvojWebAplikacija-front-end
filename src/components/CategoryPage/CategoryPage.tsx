@@ -2,7 +2,7 @@ import { faListAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import { Card, Container } from "react-bootstrap";
-import CategoryType from "../../types/categoryType";
+import CategoryType from "../../types/CategoryType";
 
 interface CategoryPageProporties {
     match: {

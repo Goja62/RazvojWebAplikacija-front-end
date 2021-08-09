@@ -128,12 +128,12 @@ export class UserRegistrationPage extends React.Component {
 
     private doRegister() {
         const data = {
-            email: this.state.formData?.email,
-            password: this.state.formData?.password,
-            forename: this.state.formData?.forename,
-            surname: this.state.formData?.surname,
-            phoneNumber: this.state.formData?.phone,
-            postalAddress: this.state.formData?.address,
+            email: this.state.formData.email,
+            password: this.state.formData.password,
+            forename: this.state.formData.forename,
+            surname: this.state.formData.surname,
+            phoneNumber: this.state.formData.phone,
+            postalAddress: this.state.formData.address,
         };
 
         api('/auth/user/register/', 'post', data)

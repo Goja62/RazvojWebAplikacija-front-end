@@ -1,7 +1,7 @@
-import { faListAlt } from "@fortawesome/free-solid-svg-icons";
+import { faListAlt, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
-import { Card, Col, Container, Row } from "react-bootstrap";
+import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 import { Link, Redirect } from "react-router-dom";
 import api, { ApiResponse } from "../../api/api";
 import { ApiConfig } from "../../Config/api.config";
@@ -22,6 +22,12 @@ interface CategoryPageState {
     subcategories?: CategoryType[];
     articles?: ArticleType[];
     message: string;
+    filters: {
+        keywords: string,
+        priceMinimun: number,
+        priceMaximum: number,
+        order: "name asc" | "name desc" | "price asc" | "price desc";
+    }
 } 
 
 interface CategoryDto {
@@ -52,6 +58,12 @@ export class CategoryPage extends React.Component<CategoryPageProporties> {
         this.state = {
             isUserLoggedIn: true,
             message: '',
+            filters: {
+                keywords: '',
+                priceMinimun: 0.01,
+                priceMaximum: 100000,
+                order: "price asc",
+            }
         };
     }
 
@@ -106,13 +118,131 @@ export class CategoryPage extends React.Component<CategoryPageProporties> {
 
                         { this.showSubcategories() }
 
-                        { this.showArticles() }
+                        <Row>
+                            <Col xs = "12" md = "4" lg = "3">
+                                { this.printFilters() }
+                            </Col>
+                            <Col xs = "12" md = "8" lg = "9">
+                                { this.showArticles() }
+                            </Col>
+                        </Row>
                     </Card.Body>
                 </Card>
             </Container>
         )
     }
 
+    private setNewFilter(newFilter: any) {
+        this.setState(Object.assign(this.state, {
+            filter: newFilter
+        }))
+    }
+
+    private filterKeywordsChanged(event: React.ChangeEvent<HTMLInputElement>) {
+        this.setNewFilter(Object.assign(this.state.filters, {
+            keywords: event.target.value,
+        }));
+    }
+
+    private filterPriceMinChanged(event: React.ChangeEvent<HTMLInputElement>) {
+        this.setNewFilter(Object.assign(this.state.filters, {
+            priceMinimun: Number(event.target.value)
+        }));
+    }
+
+    private filterPriceMaxChanged(event: React.ChangeEvent<HTMLInputElement>) {
+        this.setNewFilter(Object.assign(this.state.filters, {
+            priceMaximum: Number(event.target.value)
+        }));
+    }
+
+    private filterOrderChanged(event: React.ChangeEvent<HTMLSelectElement>) {
+        this.setNewFilter(Object.assign(this.state.filters, {
+            order: event.target.value
+        }));
+    }
+
+    private applyFilters() {
+        this.getCategoryData()
+    }
+
+    private printFilters() {
+        return (
+            <>
+                <Form.Group>
+                    <Form.Label htmlFor = "keywords">Search keywords:</Form.Label>
+                    <Form.Control 
+                        type = "text" 
+                        id = "keywords" 
+                        value = { this.state.filters?.keywords } 
+                        onChange = { (e) => this.filterKeywordsChanged(e as any) }>
+                    </Form.Control>
+                </Form.Group>
+                <Form.Group>
+                    <Row>
+                        <Col xs = "12" sm = "6">
+                            <Form.Label htmlFor = "priceMin">Minimum price:</Form.Label>
+                            <Form.Control
+                                type = "number"
+                                id = "priceMin"
+                                step =  "0.01"
+                                min = "0.01"
+                                max = "99999.99"
+                                value = { this.state.filters?.priceMinimun }
+                                onChange = { (e) => this.filterPriceMinChanged(e as any) }>
+                            </Form.Control>
+                        </Col>
+                    </Row>
+                </Form.Group>
+                <Form.Group>
+                    <Row>
+                        <Col xs = "12" sm = "6">
+                            <Form.Label htmlFor = "priceMax">Maximum price:</Form.Label>
+                            <Form.Control className="mb-3"
+                                type = "number"
+                                id = "priceMax"
+                                step =  "0.01"
+                                min = "0.02"
+                                max = "100000"
+                                value = { this.state.filters?.priceMaximum }
+                                onChange = { (e) => this.filterPriceMaxChanged(e as any) }>
+                            </Form.Control>
+                        </Col>
+                    </Row>
+                </Form.Group>
+                <Form.Group>
+                    <Form.Control className="mb-3"
+                        as = "select" 
+                        id = "sortOrder"
+                        value = { this.state.filters?.order }
+                        onChange = { (e) => this.filterOrderChanged(e as any) }>
+                        <option value = "name asc">Sort by name ascending</option>
+                        <option value = "name desc">Sort by name descending</option>
+                        <option value = "price asc">Sort by price ascending</option>
+                        <option value = "price desc">Sort by price descending</option>
+                    </Form.Control>
+                </Form.Group>
+                <Form.Group>
+                    <Button variant = "primary"  className = "w-100" onClick = { () => this.applyFilters() }>
+                        <FontAwesomeIcon icon = { faSearch }></FontAwesomeIcon>Search
+                    </Button>
+                </Form.Group>
+            </>
+        )
+    }
+
+    private printOptionalMessage() {
+        if (this.state.message === '') {
+            return;
+        }
+
+        return (
+            <Card.Text>
+                { this.state.message }
+             </Card.Text>
+        )
+    }
+    
     private showSubcategories() {
         if (this.state.subcategories?.length === 0) {
             return;
@@ -140,18 +270,6 @@ export class CategoryPage extends React.Component<CategoryPageProporties> {
         );
     }
 
-    private printOptionalMessage() {
-        if (this.state.message === '') {
-            return;
-        }
-
-        return (
-            <Card.Text>
-                { this.state.message }
-             </Card.Text>
-        )
-    }
-    
 
     private showArticles() {
         if (this.state.articles?.length === 0) {
@@ -232,14 +350,18 @@ export class CategoryPage extends React.Component<CategoryPageProporties> {
             this.setSubcategories(subcategories);
         });
 
+        const orderParts = this.state.filters.order.split(' ');
+        const orderBy = orderParts[0];
+        const orderDirection = orderParts[1].toUpperCase()
+
         api('api/article/search/', 'post', {
             categoryId: Number(this.props.match.params.cId),
-            keywords : '',
-            priceMin: 0.01,
-            priceMax: Number.MAX_SAFE_INTEGER,
+            keywords : this.state.filters?.keywords,
+            priceMin: this.state.filters?.priceMinimun,
+            priceMax: this.state.filters?.priceMaximum,
             features: [],
-            orderBy: "price",
-            orderDirection: "ASC"
+            orderBy: orderBy,
+            orderDirection: orderDirection,
         })
         .then((res: ApiResponse) => {
             if (res.status === 'login') {
@@ -277,7 +399,6 @@ export class CategoryPage extends React.Component<CategoryPageProporties> {
             }) 
 
             this.setArticles(articles);
-            
         })
     }
 

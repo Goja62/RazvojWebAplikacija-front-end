@@ -69,7 +69,7 @@ async function responseHandler(
 
     let response: ApiResponse;
 
-    if (res.data.statusCode === 0) {
+    if (res.data.statusCode === 401) {
         response = {
             status: 'login',
             data: null,

@@ -7,9 +7,9 @@ import { Container, Card, Row, Col } from 'react-bootstrap';
 import '@fortawesome/fontawesome-free/css/fontawesome.min.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faListAlt } from '@fortawesome/free-solid-svg-icons';
-import CategoryType from '../../types/CategoryType';
 import { Link, Redirect } from 'react-router-dom';
 import api, { ApiResponse } from '../../api/api';
+import CategoryType from '../../types/CategoryType';
 
 interface HomePageState {
     isUserLoggedIn: boolean;
@@ -44,7 +44,7 @@ class HomePage extends React.Component {
 
 
     private getCategoties() {
-        api('api/category', 'get', {})
+        api('api/category?filter=parentCategoryId||$isnull ', 'get', {})
         .then((res: ApiResponse) => {
             if (res.status === 'error' || res.status === 'login') {
                 this.setLogginState(false);

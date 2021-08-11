@@ -27,7 +27,16 @@ interface CategoryPageState {
         priceMinimun: number,
         priceMaximum: number,
         order: "name asc" | "name desc" | "price asc" | "price desc";
-    }
+        selectedFeatures: {
+            featureId: number;
+            value: string;
+        }[];
+    };
+    features: {
+        featureId: number;
+        name: string;
+        values: string[];
+    }[];  
 } 
 
 interface CategoryDto {
@@ -36,17 +45,17 @@ interface CategoryDto {
 }
 
 interface ArticleDto {
-    articleId: number,
-    name: string,
-    excerpt?: string,
-    description?: string,
+    articleId: number;
+    name: string;
+    excerpt?: string;
+    description?: string;
     articlePrices?: {
-        price: number,
-        createdAt: string,
+        price: number;
+        createdAt: string;
     }[],
     photos?: {
-        imagePath: string,
-    }[]
+        imagePath: string;
+    }[],
 }
 
 export class CategoryPage extends React.Component<CategoryPageProporties> {
@@ -63,8 +72,18 @@ export class CategoryPage extends React.Component<CategoryPageProporties> {
                 priceMinimun: 0.01,
                 priceMaximum: 100000,
                 order: "price asc",
-            }
+                selectedFeatures: [],
+            },
+            features: [],
         };
+    }
+
+    private setFeatures(features: any) {
+        const newState = Object.assign(this.state, {
+            features: features,
+        });
+
+        this.setState(newState);
     }
 
     private setLogginState(isLoggedIn: boolean) {
@@ -162,6 +181,44 @@ export class CategoryPage extends React.Component<CategoryPageProporties> {
         }));
     }
 
+    private featureFilterChanged(event: React.ChangeEvent<HTMLInputElement>) {
+        const featureId = Number(event.target.dataset.featureId);
+        const value = event.target.value;
+
+        if (event.target.checked) {
+            this.addFeatureFilterValue(featureId, value);
+        } else {
+            this.removeFeatureFilterValue(featureId, value);
+        }
+    }
+
+    private addFeatureFilterValue(featureId: number, value: string) {
+        const newSelectedFeatures = [...this.state.filters.selectedFeatures ];
+
+        newSelectedFeatures.push({
+            featureId: featureId,
+            value: value,
+        });
+
+        this.setSelectedFeatures(newSelectedFeatures);
+    }
+
+    private removeFeatureFilterValue(featureId: number, value: string) {
+        const newSelectedFeatures = this.state.filters.selectedFeatures.filter(record => {
+            return !(record.featureId === featureId && record.value === value);
+        });
+
+        this.setSelectedFeatures(newSelectedFeatures);
+    }
+
+    private setSelectedFeatures(newSelectedFeatures: any) {
+        this.setState(Object.assign(this.state, {
+            filters: Object.assign(this.state.filters, {
+                selectedFeatures: newSelectedFeatures,
+            })
+        }));
+    }
+
     private applyFilters() {
         this.getCategoryData()
     }
@@ -174,7 +231,7 @@ export class CategoryPage extends React.Component<CategoryPageProporties> {
                     <Form.Control 
                         type = "text" 
                         id = "keywords" 
-                        value = { this.state.filters?.keywords } 
+                        value = { this.state.filters.keywords } 
                         onChange = { (e) => this.filterKeywordsChanged(e as any) }>
                     </Form.Control>
                 </Form.Group>
@@ -188,7 +245,7 @@ export class CategoryPage extends React.Component<CategoryPageProporties> {
                                 step =  "0.01"
                                 min = "0.01"
                                 max = "99999.99"
-                                value = { this.state.filters?.priceMinimun }
+                                value = { this.state.filters.priceMinimun }
                                 onChange = { (e) => this.filterPriceMinChanged(e as any) }>
                             </Form.Control>
                         </Col>
@@ -222,12 +279,36 @@ export class CategoryPage extends React.Component<CategoryPageProporties> {
                         <option value = "price desc">Sort by price descending</option>
                     </Form.Control>
                 </Form.Group>
+
+                <h5>Features</h5>
+
+                { this.state.features.map(this.printFeatureFilterComponent, this) }
+
                 <Form.Group>
                     <Button variant = "primary"  className = "w-100" onClick = { () => this.applyFilters() }>
                         <FontAwesomeIcon icon = { faSearch }></FontAwesomeIcon>Search
                     </Button>
                 </Form.Group>
             </>
+        )
+    }
+
+    private printFeatureFilterComponent(feature: { featureId: number; name: string; values: string[]; }) {
+        return (
+            <Form.Group key={ 'Feature Filter ' + feature.featureId }>
+                <Form.Label><strong>{ feature.name }</strong></Form.Label>
+                { feature.values.map(value => this.printFeatureFilterCheckBox(feature, value), this) }
+            </Form.Group>
+        );
+    }
+
+    private printFeatureFilterCheckBox(feature: any, value: string) {
+        return (
+            <Form.Check type="checkbox" label={ value }
+                        value={ value }
+                        data-feature-id={ feature.featureId }
+                        onChange={ (event: any) => this.featureFilterChanged(event as any) }
+                        />
         )
     }
 
@@ -339,7 +420,7 @@ export class CategoryPage extends React.Component<CategoryPageProporties> {
 
             this.setCategoryData(categoryData);
 
-            const subcategories: CategoryType[] = 
+            const subcategories: CategoryType[] =
             res.data.categories.map((category: CategoryDto) => {
                 return {
                     categoryId: category.categoryId,
@@ -354,12 +435,39 @@ export class CategoryPage extends React.Component<CategoryPageProporties> {
         const orderBy = orderParts[0];
         const orderDirection = orderParts[1].toUpperCase()
 
+        const featureFilters: any[] = [];
+
+        for (const item of this.state.filters.selectedFeatures) {
+            let found = false;
+            let foundRef = null;
+
+            for (const featureFilter of featureFilters) {
+                if (featureFilter.featureId === item.featureId) {
+                    found = true;
+                    foundRef = featureFilter;
+                    console.log(featureFilter.featureId)
+                    break;
+                }
+            }
+
+            if (!found) {
+                featureFilters.push({
+                    featureId: item.featureId,
+                    values: [ item.value ],
+                });
+            } else {
+                foundRef.values.push(item.value);
+            }
+            console.log(foundRef)
+            console.log(featureFilters)
+        }
+
         api('api/article/search/', 'post', {
             categoryId: Number(this.props.match.params.cId),
             keywords : this.state.filters?.keywords,
             priceMin: this.state.filters?.priceMinimun,
             priceMax: this.state.filters?.priceMaximum,
-            features: [],
+            features: featureFilters,
             orderBy: orderBy,
             orderDirection: orderDirection,
         })
@@ -400,6 +508,22 @@ export class CategoryPage extends React.Component<CategoryPageProporties> {
 
             this.setArticles(articles);
         })
+
+        this.getFeatures();
     }
 
+    getFeatures() {
+        api('api/feature/values/' + this.props.match.params.cId, 'get', {})
+        .then((res: ApiResponse) => {
+            if (res.status === 'login') {
+                return this.setLogginState(false);
+            }
+
+            if (res.status === 'error') {
+                return this.setMessage('Request error. Please try to refresh the page.');
+            }
+
+            this.setFeatures(res.data.features);
+        });
+    }
 }

@@ -4,7 +4,7 @@ import './index.css';
 import HomePage from './components/App/HomePage';
 import reportWebVitals from './reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.min.css'
-import { MainManu, MainManuItem } from './components/MaunManu/MainManu';
+import { MainManu, MainManuItem } from './components/MainManu/MainManu';
 import { ContactPage } from './components/ContactPage/ContactPage';
 import { UserLoginPage } from './components/UserLoginPage/UserLoginPage';
 import { HashRouter, Route } from 'react-router-dom';

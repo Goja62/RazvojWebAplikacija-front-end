@@ -4,9 +4,9 @@ import React from "react";
 import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 import { Link, Redirect } from "react-router-dom";
 import api, { ApiResponse } from "../../api/api";
-import { ApiConfig } from "../../Config/api.config";
 import { ArticleType } from "../../types/ArticleType";
 import CategoryType from "../../types/CategoryType";
+import SingleArticlePreview from "../SingleArticlePreview/SingleArticlePreview";
 
 interface CategoryPageProporties {
     match: {
@@ -368,25 +368,7 @@ export class CategoryPage extends React.Component<CategoryPageProporties> {
 
     private singleArticle(article: ArticleType) {
         return (
-            <Col lg = "4" md = "6" sm = "6" xs = "12">
-                <Card className="mb-3">
-                    <Card.Header>
-                        <img alt = { article.name } src = { ApiConfig.PHOTO_PATH + 'small/' + article.imageUrl} className = "w-100"></img>
-                    </Card.Header>
-                    <Card.Body>
-                        <Card.Title as = "p">
-                            <strong>{ article.name }</strong>
-                        </Card.Title>
-                        <Card.Text>
-                            { article.excerpt }
-                        </Card.Text>
-                        <Card.Text>
-                            Price: { Number(article.price).toFixed(2) } EUR
-                        </Card.Text>
-                        <Link to = { `/article/${ article.articleId }`} className =  "btn btn-primary w-100 btn-sm">Open article page</Link>
-                    </Card.Body>
-                </Card>
-            </Col>
+            <SingleArticlePreview article = { article }></SingleArticlePreview>
         );
     }
 

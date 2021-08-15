@@ -6,6 +6,7 @@ import { Link, Redirect } from "react-router-dom";
 import api, { ApiResponse } from "../../api/api";
 import { ArticleType } from "../../types/ArticleType";
 import CategoryType from "../../types/CategoryType";
+import RoledMainMenu from "../RoledMainMenu/RoledMainMenu";
 import SingleArticlePreview from "../SingleArticlePreview/SingleArticlePreview";
 
 interface CategoryPageProporties {
@@ -127,6 +128,7 @@ export class CategoryPage extends React.Component<CategoryPageProporties> {
         
         return(
             <Container>
+            <RoledMainMenu role = 'user'></RoledMainMenu>
                 <Card>
                     <Card.Body>
                         <Card.Title>

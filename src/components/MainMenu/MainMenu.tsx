@@ -1,9 +1,9 @@
 import React from "react";
-import { Container, Nav } from "react-bootstrap";
+import { Nav } from "react-bootstrap";
 import { HashRouter, Link } from "react-router-dom";
 import Cart from "../Cart/Cart";
 
-export class MainManuItem {
+export class MainMenuItem {
 	text: string = '';
 	link: string = '#';
 
@@ -14,24 +14,25 @@ export class MainManuItem {
 }
 
 interface MainManuProporties {
-	items: MainManuItem[];
+	items: MainMenuItem[];
+	showCart?: boolean;
 }
 
 interface mainManuState {
-	items: MainManuItem[];
+	items: MainMenuItem[];
 }
 
-export class MainManu extends React.Component<MainManuProporties> {
+export class MainMenu extends React.Component<MainManuProporties> {
 	state: mainManuState
 	constructor(props: MainManuProporties | Readonly<MainManuProporties>) {
 		super(props);
 
 		this.state = {
-			items: props.items
+			items: props.items,
 		}
 	}
 
-	setItems(items: MainManuItem[]) {
+	setItems(items: MainMenuItem[]) {
 		this.setState({
 			items: items,
 		})
@@ -39,18 +40,16 @@ export class MainManu extends React.Component<MainManuProporties> {
 
 	render() {
 		return(
-			<Container>
-				<Nav variant = "tabs">
-					<HashRouter>
-						{ this.state.items.map(this.makeNavLink) }
-						<Cart></Cart>
-					</HashRouter>
-				</Nav>
-			</Container>
+			<Nav variant = "tabs">
+				<HashRouter>
+					{ this.state.items.map(this.makeNavLink) }
+					{ this.props.showCart ? <Cart></Cart> : '' }
+				</HashRouter>
+			</Nav>
 		);
 	}
 
-	private makeNavLink(item: MainManuItem) {
+	private makeNavLink(item: MainMenuItem) {
 		return(
 			<Link to = { item.link } className = 'nav-link'>{ item.text }</Link>
 		);

@@ -4,7 +4,6 @@ import './index.css';
 import HomePage from './components/HomePage/HomePage';
 import reportWebVitals from './reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.min.css'
-import { MainManu, MainManuItem } from './components/MainManu/MainManu';
 import { ContactPage } from './components/ContactPage/ContactPage';
 import { UserLoginPage } from './components/UserLoginPage/UserLoginPage';
 import { HashRouter, Route } from 'react-router-dom';
@@ -15,21 +14,8 @@ import OrdersPage from './components/OrdersPage/OrdersPage';
 import { AdministratorLoginPage } from './components/AdministratorLoginPage/AdministratorLoginPage';
 import AdministratorDashboard from './components/AdministratorDashboard/AdministratorDashboard';
 
-const menuItems = [
-  new MainManuItem('Home', '/'),
-  new MainManuItem('Contact', '/contact/'),
-  new MainManuItem('User log in', '/user/login/'),
-  new MainManuItem('Admin log in', '/administrator/login/'),
-  new MainManuItem('Admin dashboard', '/administrator/dashboard/'),
-  new MainManuItem('My orders', '/user/login/'),
-  new MainManuItem('Register new user', '/user/orders/'),
-
-  
-]
-
 ReactDOM.render(
   <React.StrictMode>
-    <MainManu items = { menuItems }></MainManu>
     <HashRouter>
       <Switch>
         <Route exact path = "/" component = { HomePage }></Route>

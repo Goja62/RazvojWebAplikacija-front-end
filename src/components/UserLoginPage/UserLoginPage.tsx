@@ -4,6 +4,7 @@ import React from "react";
 import { Alert, Button, Card, Col, Container, Form } from "react-bootstrap";
 import { Redirect } from "react-router-dom";
 import api, { ApiResponse, saveRefreshToken, saveToken } from "../../api/api";
+import RoledMainMenu from "../RoledMainMenu/RoledMainMenu";
 
 interface UserLoginPageState {
     email: string;
@@ -97,6 +98,7 @@ export class UserLoginPage extends React.Component {
 
         return(
             <Container>
+            <RoledMainMenu role = 'visitor'></RoledMainMenu>
                 <Col md = { { span: 6, offset: 3 } }>
                     <Card>
                         <Card.Body>

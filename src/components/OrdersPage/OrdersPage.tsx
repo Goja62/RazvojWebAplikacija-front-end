@@ -7,6 +7,7 @@ import { Container, Card, Table, Modal, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBox, faBoxOpen } from '@fortawesome/free-solid-svg-icons';
 import CartType from '../../types/CartType';
+import RoledMainMenu from '../RoledMainMenu/RoledMainMenu';
 
 interface OrdersPageState {
     isUserLoggedIn: boolean;
@@ -102,7 +103,7 @@ export default class OrdersPage extends React.Component {
     private getOrders() {
         api('/api/user/cart/orders/', 'get', {})
         .then((res: ApiResponse) => {
-            if (res.status === 'error' || res.status === 'login') {
+            if (res.status === 'login' || res.status === 'error') {
                 return this.setLogginState(false);
             }
 
@@ -186,6 +187,7 @@ export default class OrdersPage extends React.Component {
 
         return (
             <Container>
+            <RoledMainMenu role = 'user'></RoledMainMenu>
                 <Card>
                     <Card.Body>
                         <Card.Title>

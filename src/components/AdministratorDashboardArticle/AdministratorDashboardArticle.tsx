@@ -1,9 +1,9 @@
 import { faEdit, faListAlt, faListUl, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
-import { Alert, Button, Card, Container, Form, Modal, Table } from "react-bootstrap";
+import { Alert, Button, Card, Col, Container, Form, Modal, Row, Table } from "react-bootstrap";
 import { Link, Redirect } from "react-router-dom";
-import api, { ApiResponse } from "../../api/api";
+import api, { apiFile, ApiResponse } from "../../api/api";
 import ApiArticleDto from "../../dtos/ApiArticleDto";
 import ApiCategoryDto from "../../dtos/ApiCategoryDto.ts";
 import { ArticleType } from "../../types/ArticleType";
@@ -24,10 +24,9 @@ interface AdministratorDashboardArticleState {
         categoryId: number;
         excerpt: string;
         description: string;
-        status: string;
-        isPromoted: number;
         price: number;
         features: {
+            use: number;
             featureId: number;
             name: string;
             value: string;
@@ -47,11 +46,17 @@ interface AdministratorDashboardArticleState {
         isPromoted: number;
         price: number;
         features: {
+            use: number;
             featureId: number;
             name: string;
             value: string;
         }[];
     };
+}
+
+interface FeatureBaseType {
+    featureId: number;
+    name: string;
 }
 
 class AdministratorDashboardArticle extends React.Component {
@@ -78,8 +83,6 @@ class AdministratorDashboardArticle extends React.Component {
                 categoryId: 1,
                 excerpt: '',
                 description: '',
-                status: 'available',
-                isPromoted: 0,
                 price: 0.01,
                 features: [],
             },
@@ -108,7 +111,7 @@ class AdministratorDashboardArticle extends React.Component {
         ));
     }
 
-    private setAddModalStringFiledState(filedName: string, newValue: string) {
+    private setAddModalStringFieldState(filedName: string, newValue: string) {
         this.setState(Object.assign(this.state, 
             Object.assign(this.state.addModal, {
                 [ filedName ]: newValue
@@ -148,9 +151,63 @@ class AdministratorDashboardArticle extends React.Component {
         ));
     }
 
+    private setAddModalFeatureUse(featureId: number, use: boolean) {
+        const addFeatures: { featureId: number; use: number; }[] = [...this.state.addModal.features];
+
+        for (const feature of addFeatures) {
+            if (feature.featureId === featureId) {
+                feature.use = use ? 1 : 0;
+                break;
+            }
+        }
+
+        this.setState(Object.assign(this.state,
+            Object.assign(this.state.addModal, {
+                features: addFeatures,
+            }),
+        ));
+    }
+
+    private setAddModalFeatureValue(featureId: number, value: string) {
+        const addFeatures: { featureId: number; value: string; }[] = [...this.state.addModal.features];
+
+        for (const feature of addFeatures) {
+            if (feature.featureId === featureId) {
+                feature.value = value;
+                break;
+            }
+        }
+
+        this.setState(Object.assign(this.state,
+            Object.assign(this.state.addModal, {
+                features: addFeatures,
+            }),
+        ));
+    }
+
     componentDidMount() {
         this.getCategories();
         this.getArticles();
+    }
+
+    private async getFeaturesByCategoryId(categoryId: number): Promise<FeatureBaseType[]> {
+        return new Promise(resolve => {
+            api('/api/feature/?filter=categoryId||$eq||' + categoryId + '/', 'get', {}, 'administrator')
+            .then((res: ApiResponse) => {
+                if (res.status === "error" || res.status === "login") {
+                    this.setLogginState(false);
+                    return resolve([]);
+                }
+
+                const features: FeatureBaseType[] = res.data.map((item: any) => ({
+                    featureId: item.featureId,
+                    name: item.name,
+                }));
+
+                resolve(features);
+            });
+        })
+        
     }
 
     private getCategories() {
@@ -227,6 +284,24 @@ class AdministratorDashboardArticle extends React.Component {
         this.setState(newState);
     }
 
+    private async addModalCategoryChanged(event: React.ChangeEvent<HTMLSelectElement>) {
+        this.setAddModalNumberFiledState('categoryId', event.target.value);
+
+        const features = await this.getFeaturesByCategoryId(this.state.addModal.categoryId);
+        const stateFeatures  = features.map(feature => ({
+            featureId: feature.featureId,
+            name: feature.name,
+            value: '',
+            use: 0,
+        }));
+
+        this.setState(Object.assign(this.state,
+            Object.assign(this.state.addModal, {
+                features: stateFeatures,
+            })
+        ))
+    }
+
     render() {
         if (this.state.isAdministratorLoggedIn === false) {
             return (
@@ -290,7 +365,15 @@ class AdministratorDashboardArticle extends React.Component {
                     </Card.Body>
                 </Card>
 
-                <Modal size = "lg" centered show = { this.state.addModal.visible } onHide = { () => this.setAddModalVisibleState(false) }>
+                <Modal size = "lg" 
+                    centered show = { this.state.addModal.visible } 
+                    onHide = { () => this.setAddModalVisibleState(false) }
+                    onEntered={ () => {
+                        if (document.getElementById('add-photo')) {
+                            const filePicker: any = document.getElementById('add-photo');
+                            filePicker.value = '';
+                        }
+                    } }>
                     <Modal.Header closeButton>
                         <Modal.Title>Add new article</Modal.Title>
                     </Modal.Header>
@@ -301,7 +384,7 @@ class AdministratorDashboardArticle extends React.Component {
                                     id = "add-categoryId" 
                                     as = "select" 
                                     value = { this.state.addModal.categoryId.toString() }
-                                    onChange = { (e) => this.setAddModalNumberFiledState('categoryId', e.target.value)}>
+                                    onChange = { (e) => this.addModalCategoryChanged(e as any) }>
                                     { this.state.categories.map(category => (
                                         <option value = { category.categoryId?.toString() }>{ category.name }</option>
                                     )) }
@@ -314,7 +397,7 @@ class AdministratorDashboardArticle extends React.Component {
                                     id = "add-name" 
                                     type = "text" 
                                     value = { this.state.addModal.name }
-                                    onChange = { (e) => this.setAddModalStringFiledState('name', e.target.value)}>
+                                    onChange = { (e) => this.setAddModalStringFieldState('name', e.target.value)}>
                                 </Form.Control>
                             </Form.Group>
                             
@@ -324,7 +407,7 @@ class AdministratorDashboardArticle extends React.Component {
                                     id = "add-excerpt" 
                                     type = "text" 
                                     value = { this.state.addModal.excerpt }
-                                    onChange = { (e) => this.setAddModalStringFiledState('excerpt', e.target.value)}>
+                                    onChange = { (e) => this.setAddModalStringFieldState('excerpt', e.target.value)}>
                                 </Form.Control>
                             </Form.Group>
 
@@ -335,36 +418,59 @@ class AdministratorDashboardArticle extends React.Component {
                                     as = "textarea"
                                     rows = { 10 }
                                     value = { this.state.addModal.description }
-                                    onChange = { (e) => this.setAddModalStringFiledState('description', e.target.value)}>
+                                    onChange = { (e) => this.setAddModalStringFieldState('description', e.target.value)}>
+                                </Form.Control>
+                            </Form.Group>
+                            {/* 
+                            <Form.Group>
+                                <Form.Label htmlFor="edit-status">Status</Form.Label>
+                                <Form.Control 
+                                    id="edit-status" 
+                                    as="select" 
+                                    value = { this.state.addModal.status.toString() }
+                                    onChange={ (e) => this.setAddModalStringFieldState('status', e.target.value) }>
+                                    <option value="available">Available</option>
+                                    <option value="visible">Visible</option>
+                                    <option value="hidden">Hidden</option>
                                 </Form.Control>
                             </Form.Group>
 
                             <Form.Group className = "mb-3">
-                                <Form.Label htmlFor = "add-status">Status</Form.Label>
+                                <Form.Label htmlFor = "add-isPromoted">Promoted</Form.Label>
                                 <Form.Control 
-                                    id = "add-status" 
+                                    id = "add-isPromoted" 
                                     as = "select"
-                                    value = { this.state.addModal.status }
-                                    onChange = { (e) => this.setAddModalStringFiledState('status', e.target.value)}>
+                                    value = { this.state.addModal.isPromoted }
+                                    onChange = { (e) => this.setAddModalNumberFiledState('isPromoted', e.target.value)}>
                                     <option value = "0">Not promoted</option>
                                     <option value = "1">Is promoted</option>
                                 </Form.Control>
                             </Form.Group>
-
-                            <Form.Group>
-                            <Form.Label htmlFor="edit-status">Status</Form.Label>
-                            <Form.Control 
-                                id="edit-status" 
-                                as="select" 
-                                value = { this.state.addModal.status.toString() }
-                                onChange={ (e) => this.setAddModalStringFiledState('status', e.target.value) }>
-                                <option value="available">Available</option>
-                                <option value="visible">Visible</option>
-                                <option value="hidden">Hidden</option>
-                            </Form.Control>
-                        </Form.Group>
-
+                            */}
                             
+                            <Form.Group>
+                                <Form.Label htmlFor = "add-price">Price</Form.Label>
+                                <Form.Control 
+                                    id = "add-price" 
+                                    type = "number"
+                                    min = { 0.01 }
+                                    step = { 0.01 } 
+                                    value = { this.state.addModal.price }
+                                    onChange = { (e) => this.setAddModalNumberFiledState('price', e.target.value)}>
+                                </Form.Control>
+                            </Form.Group>
+
+                            <div>
+                                { this.state.addModal.features.map(this.printAddModalFeatureInput, this) }
+                            </div>
+
+                            <Form.Group className = "mb-4">
+                                <Form.Label htmlFor = "add-photo">Article photo</Form.Label>
+                                <Form.File 
+                                    id = "add-photo">
+                                </Form.File>
+                            </Form.Group>
+                                
                             <Form.Group>
                                 <Button 
                                     variant = "primary"
@@ -383,34 +489,92 @@ class AdministratorDashboardArticle extends React.Component {
         );
     }
 
-    private showAddModal() {
-        this.setAddModalStringFiledState('name', '');
-        this.setAddModalStringFiledState('excerpt', '');
-        this.setAddModalStringFiledState('imagePath', '');
-        this.setAddModalNumberFiledState('parentArticleId', '');
-        this.setAddModalStringFiledState('message', '');
-        this.setAddModalVisibleState(true);
+    private printAddModalFeatureInput(feature: any) {
+        return (
+            <Form.Group>
+                <Row>
+                    <Col xs="4" sm="1" className="text-center">
+                        <input 
+                            type = "checkbox" 
+                            value = "1" 
+                            checked = { feature.use === 1 }
+                            onChange = { (e) => this.setAddModalFeatureUse(feature.featureId, e.target.checked) }>
+                        </input>
+                    </Col>
+                    <Col xs="8" sm="3">
+                        { feature.name }
+                    </Col>
+                    <Col xs="12" sm="8">
+                        <Form.Control 
+                            type="text" 
+                            value={ feature.value }
+                            onChange={ (e) => this.setAddModalFeatureValue(feature.featureId, e.target.value) }>
+                        </Form.Control>
+                    </Col>
+                </Row>
+            </Form.Group>
+        );
     }
 
+    private showAddModal() {
+        this.setAddModalStringFieldState('message', '');
+
+        this.setAddModalStringFieldState('name', '');
+        this.setAddModalStringFieldState('excerpt', '');
+        this.setAddModalStringFieldState('description', '');
+        this.setEditModalNumberFiledState('categoryId', '1');
+        this.setEditModalNumberFiledState('price', '0.01');
+        this.setState(Object.assign(this.state,
+            Object.assign(this.state.addModal, {
+                features: [],
+            }),
+        ));
+
+        this.setAddModalVisibleState(true);
+    }
     private doAddArticle() {
+        const filePicker: any = document.getElementById('add-photo');
+
+        if (filePicker?.files.length === 0) {
+            this.setAddModalStringFieldState('message', 'You must select a file to upload!');
+            return;
+        }
+
         api('/api/article/', 'post', {
+            categoryId: this.state.addModal.categoryId,
             name: this.state.addModal.name,
+            excerpt: this.state.addModal.excerpt,
+            description: this.state.addModal.description,
+            price: this.state.addModal.price,
+            features: this.state.addModal.features
+                .filter(feature => feature.use === 1)    
+                .map(feature => ({
+                    featureId: feature.featureId,
+                    value: feature.value,
+                })),
         }, 'administrator')
-        api('/api/article/', 'get', {}, 'administrator' )
-        .then((res: ApiResponse) => {
+        .then(async (res: ApiResponse) => {
+            console.log(res.status)
             if (res.status === "login") {
                 this.setLogginState(false);
                 return;
             }
 
             if (res.status === "error") {
-                this.setAddModalStringFiledState('message', JSON.stringify(res.data))
+                this.setAddModalStringFieldState('message', JSON.stringify(res.data))
                 return;
             }
+
+            const articleId: number = res.data.articleId;const file = filePicker.files[0];
+            await this.uploadArticlePhoto(articleId, file);
 
             this.setAddModalVisibleState(false);
             this.getArticles();
         });
+    }
+
+    private async uploadArticlePhoto(articleId: number, file: File) {
+        return await apiFile('/api/article/' + articleId + '/uploadPhoto/', 'photo', file, 'administrator');
     }
 
     private showEditModal(article: ArticleType) {
@@ -433,7 +597,7 @@ class AdministratorDashboardArticle extends React.Component {
             }
 
             if (res.status === "error") {
-                this.setAddModalStringFiledState('message', JSON.stringify(res.data))
+                this.setAddModalStringFieldState('message', JSON.stringify(res.data))
                 return;
             }
 

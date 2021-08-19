@@ -16,6 +16,7 @@ import AdministratorDashboard from './components/AdministratorDashboard/Administ
 import AdministratorDashboardCategory from './components/AdministratorDashboardCategory/AdministratorDashboardCategory';
 import AdministratorDashboardFeature from './components/AdministratorDashboardFeature/AdministratorDashboardFeature';
 import AdministratorDashboardArticle from './components/AdministratorDashboardArticle/AdministratorDashboardArticle';
+import AdministratorDashboardPhoto from './components/AdministratorDashboardPhoto/AdministratorDashboardPhoto';
 
 ReactDOM.render(
   <React.StrictMode>
@@ -31,7 +32,8 @@ ReactDOM.render(
         <Route exact path = "/administrator/dashboard" component = { AdministratorDashboard }></Route>
         <Route path = "/administrator/dashboard/category/" component = { AdministratorDashboardCategory }></Route>
         <Route path = "/administrator/dashboard/feature/:cId" component = { AdministratorDashboardFeature }></Route>
-        <Route path = "/administrator/dashboard/article" component = { AdministratorDashboardArticle }></Route>
+        <Route path = "/administrator/dashboard/article/" component = { AdministratorDashboardArticle }></Route>
+        <Route path = "/administrator/dashboard/photo/:aId" component = { AdministratorDashboardPhoto }></Route>
       </Switch>
     </HashRouter>
   </React.StrictMode>,

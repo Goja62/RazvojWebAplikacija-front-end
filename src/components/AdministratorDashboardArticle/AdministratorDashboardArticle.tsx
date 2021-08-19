@@ -1,4 +1,4 @@
-import { faEdit, faListAlt, faListUl, faPlus, faSave } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faImage, faListAlt, faPlus, faSave } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import { Alert, Button, Card, Col, Container, Form, Modal, Row, Table } from "react-bootstrap";
@@ -386,7 +386,7 @@ class AdministratorDashboardArticle extends React.Component {
                                         <td className = "text-center">
                                             <Link to = {"/administrator/dashboard/photo/" + article.articleId }
                                                 className = "btn btn-sm btn-info">
-                                                <FontAwesomeIcon icon = { faListUl }></FontAwesomeIcon> Photos
+                                                <FontAwesomeIcon icon = { faImage }></FontAwesomeIcon> Photos
                                             </Link>
                                         </td>
                                         <td className = "text-center" >

@@ -8,7 +8,7 @@ export default  interface ApiArticleDto {
     isPromoted: number;
     articleFeatures: {
         articleFeatureId: number;
-        articleId: number;
+        featureId: number;
         value: string;
     }[];
     features: {

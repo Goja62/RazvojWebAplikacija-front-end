@@ -429,7 +429,6 @@ export class CategoryPage extends React.Component<CategoryPageProporties> {
                 if (featureFilter.featureId === item.featureId) {
                     found = true;
                     foundRef = featureFilter;
-                    console.log(featureFilter.featureId)
                     break;
                 }
             }
@@ -442,8 +441,6 @@ export class CategoryPage extends React.Component<CategoryPageProporties> {
             } else {
                 foundRef.values.push(item.value);
             }
-            console.log(foundRef)
-            console.log(featureFilters)
         }
 
         api('api/article/search/', 'post', {

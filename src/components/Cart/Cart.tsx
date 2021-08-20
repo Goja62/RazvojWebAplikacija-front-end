@@ -143,7 +143,6 @@ export default class Cart extends React.Component {
 
     render() {
         const sum = this.calculateSum()
-        console.log(this.state.cart?.createdAt)
         return (
             <>
                 <Nav.Item>

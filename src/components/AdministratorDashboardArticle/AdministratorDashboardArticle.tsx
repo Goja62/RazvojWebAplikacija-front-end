@@ -258,8 +258,8 @@ class AdministratorDashboardArticle extends React.Component {
         });
     }
 
-    private putCategoriesInState(data?: ApiCategoryDto[]) {
-        const categories: CategoryType[] | undefined = data?.map(category => {
+    private putCategoriesInState(data: ApiCategoryDto[]) {
+        const categories: CategoryType[] | undefined = data.map(category => {
             return {
                 categoryId: category.categoryId,
                 name: category.name,

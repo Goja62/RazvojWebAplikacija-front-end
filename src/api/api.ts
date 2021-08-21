@@ -143,7 +143,7 @@ function getToken(role: 'user' | 'administrator'): string {
 }
 
 export function saveToken(role: 'user' | 'administrator', token: string) {
-    localStorage.setItem('api_token' + role, token, )
+    localStorage.setItem('api_token' + role, token,)
 }
 
 function getRefreshToken(role: 'user' | 'administrator'): string {
@@ -162,6 +162,12 @@ export function saveIdentity(role: 'user' | 'administrator', identity: string) {
 export function getIdentity(role: 'user' | 'administrator'): string {
     const token = localStorage.getItem('api_identity' + role);
     return 'Bearer ' + token 
+}
+
+export function removeTokenData(role: 'user' | 'administrator') {
+    localStorage.removeItem('api_token' + role)
+    localStorage.removeItem('api_refresh_token' + role)
+    localStorage.removeItem('api_identity' + role)
 }
 
 async function refreshToken(role: 'user' | 'administrator'): Promise<string | null> {

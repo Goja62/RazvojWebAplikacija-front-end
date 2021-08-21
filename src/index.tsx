@@ -19,6 +19,8 @@ import AdministratorDashboardArticle from './components/AdministratorDashboardAr
 import AdministratorDashboardPhoto from './components/AdministratorDashboardPhoto/AdministratorDashboardPhoto';
 import ArticlePage from './components/ArticlePage/ArticlePage';
 import AdministratorDashboardOrder from './components/AdministratorDashboardOrder/AdministratorDashboardOrder';
+import AdministratorLogoutPage from './components/AdministratorLogoutPage/AdministratorLogoutPage';
+import UserLogoutPage from './components/UserLogoutPage/UserLogoutPage';
 
 ReactDOM.render(
   <React.StrictMode>
@@ -27,11 +29,13 @@ ReactDOM.render(
         <Route exact path = "/" component = { HomePage }></Route>
         <Route path = "/contact" component = { ContactPage }></Route>
         <Route path = "/user/login" component = { UserLoginPage }></Route>
+        <Route path = "/user/logout" component = { UserLogoutPage }></Route>
         <Route path = "/user/register" component = { UserRegistrationPage }></Route>
         <Route path = "/category/:cId" component = { CategoryPage }></Route>
         <Route path = "/article/:aId" component = { ArticlePage }></Route>
         <Route path = "/user/order" component = { OrdersPage }></Route>
         <Route path = "/administrator/login" component = { AdministratorLoginPage }></Route>
+        <Route path = "/administrator/logout" component = { AdministratorLogoutPage }></Route>
         <Route exact path = "/administrator/dashboard" component = { AdministratorDashboard }></Route>
         <Route path = "/administrator/dashboard/category/" component = { AdministratorDashboardCategory }></Route>
         <Route path = "/administrator/dashboard/feature/:cId" component = { AdministratorDashboardFeature }></Route>

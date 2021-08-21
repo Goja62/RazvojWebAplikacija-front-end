@@ -377,12 +377,12 @@ class AdministratorDashboardArticle extends React.Component {
                             <tbody>
                                 { this.state.articles.map(article => (
                                     <tr>
-                                        <td className = "text-end">{ article.articleId }</td>
+                                        <td className = "text-right">{ article.articleId }</td>
                                         <td>{ article.name }</td>
                                         <td>{ article.category?.name }</td>
                                         <td>{ article.status }</td>
                                         <td>{ article.isPromoted ? 'Promoted' : 'Not promoted'}</td>
-                                        <td className = "text-end">{ article.price }</td>
+                                        <td className = "text-right">{ article.price }</td>
                                         <td className = "text-center">
                                             <Link to = {"/administrator/dashboard/photo/" + article.articleId }
                                                 className = "btn btn-sm btn-info">
